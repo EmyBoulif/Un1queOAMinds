@@ -17,7 +17,7 @@ def get_model() -> ModelInference:
     api_key    = os.environ["WATSONX_API_KEY"]
     url        = os.getenv("WATSONX_URL", "https://us-south.ml.cloud.ibm.com")
     project_id = os.environ["WATSONX_PROJECT_ID"]
-    model_id   = os.getenv("WATSONX_MODEL_ID", "ibm/granite-3-8b-instruct")
+    model_id   = os.getenv("WATSONX_MODEL_ID", "ibm/granite-4-h-small")
 
     credentials = Credentials(api_key=api_key, url=url)
 
