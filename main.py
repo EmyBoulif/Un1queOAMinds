@@ -1,34 +1,68 @@
-from agents.orchestrator.graph import agent_graph
 from dotenv import load_dotenv
-import os
+from agents.orchestrator.graph import agent_graph
 
 load_dotenv()
 
+_DEFAULT_CHANGE = "Add PayPal support alongside existing Stripe integration"
+_REPO_PATH      = "./payment/IBM-bob-payment-demo"
+
+
 def main():
-    print("╔══════════════════════════════════════╗")
-    print("║   🤖 IBM Bob Change Impact Analyzer  ║")
-    print("╚══════════════════════════════════════╝")
+    print("╔══════════════════════════════════════════════════╗")
+    print("║        🤖  Bob Change Impact Mode                ║")
+    print("╚══════════════════════════════════════════════════╝")
 
-    change = input("\n📝 Describe your change: ")
+    raw = input(
+        f"\n📝  Describe your change\n"
+        f"    (default: {_DEFAULT_CHANGE})\n"
+        f"    > "
+    ).strip()
+    change = raw if raw else _DEFAULT_CHANGE
 
-    result = agent_graph.invoke({
-        "change_description": change,
-        "repo_path": os.getenv("REPO_PATH", "./bob-demo"),
-        "affected_files": [],
-        "database_impact": [],
-        "tests_to_run": [],
-        "risk_level": "",
-        "impact_summary": "",
+    print(f"\n🗂️   Repo path : {_REPO_PATH}")
+    print(f"📝   Change    : {change}\n")
+
+    initial_state = {
+        # ── Input ──────────────────────────────────────
+        "change_description":  change,
+        "repo_path":           _REPO_PATH,
+        # ── Agent outputs (empty until agents run) ─────
+        "affected_files":      [],
+        "database_impact":     [],
+        "tests_to_run":        [],
+        # ── Impact report ──────────────────────────────
+        "risk_level":          "",
+        "impact_summary":      "",
+        # ── Implementation plan ────────────────────────
         "implementation_plan": "",
-        "human_approved": False,
-        "code_modified": False,
-        "test_results": {},
-        "retry_count": 0,
-        "final_report": "",
-        "errors": []
-    })
+        # ── Human approval ─────────────────────────────
+        "human_approved":      False,
+        # ── Execution ──────────────────────────────────
+        "code_modified":       False,
+        "test_results":        {},
+        "retry_count":         0,
+        # ── Final report ───────────────────────────────
+        "final_report":        "",
+        # ── Errors ─────────────────────────────────────
+        "errors":              [],
+    }
 
-    print("\n✅ Pipeline completed!")
+    result = agent_graph.invoke(initial_state)
+
+    print("\n" + "═" * 60)
+    print("📄  FINAL REPORT")
+    print("═" * 60)
+    print(result.get("final_report", "(no report generated)"))
+    print("═" * 60)
+
+    errors = result.get("errors") or []
+    if errors:
+        print(f"\n⚠️   {len(errors)} error(s) recorded during the run:")
+        for err in errors:
+            print(f"   • {err}")
+
+    print("\n✅  Pipeline completed.")
+
 
 if __name__ == "__main__":
     main()
